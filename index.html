@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://api.open-meteo.com https://geocoding-api.open-meteo.com https://api.bigdatacloud.net https://nominatim.openstreetmap.org https://router.project-osrm.org; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-src 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Work Manager 2 – STEM</title>
+<meta name="theme-color" content="#1e3a5f" id="themeColor">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WM 2">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- APP -->
+<div id="app" style="display:block;height:100%">
+
+<!-- HOME -->
+<div id="hscr" class="scr on">
+  <div class="hdr home-hdr">
+    <div>
+      <div class="eyebrow" id="hdrD"></div>
+      <h1 class="greet" id="hdrG">Buongiorno</h1>
+    </div>
+    <div class="hdr-actions">
+      <button type="button" class="iconbtn" data-action="openSearch" aria-label="Cerca ovunque"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button type="button" class="iconbtn syncbtn" data-sync-indicator data-action="openSyncSettings" aria-label="Sincronizzazione"></button>
+      <button type="button" class="av avbtn" data-action="goTab" data-args="profilo" aria-label="Profilo" data-user-initials>ER</button>
+    </div>
+  </div>
+  <div class="sc">
+    <div class="trip-hero" id="tripHero" style="display:none"></div>
+    <div class="stack">
+      <div class="trip-now" id="tripNow" style="display:none"></div>
+      <section class="ucard wx" id="wxCard" aria-label="Meteo"><div class="wx-d" style="padding:6px 2px">Caricamento meteo…</div></section>
+      <div id="todayCard"></div>
+      <div id="followBox"></div>
+      <section class="ucard where" id="wwid" style="display:none" aria-label="Dove andare"></section>
+      <div id="tripBp" style="display:none"></div>
+      <section class="ucard evs" aria-label="Prossimi 7 giorni">
+        <div class="evs-h"><span class="lbl">Prossimi 7 giorni</span><button type="button" class="pill" data-action="openEvM">+ Aggiungi</button></div>
+        <div id="evBox"></div>
+      </section>
+      <div id="weekBox"></div>
+    </div>
+    <div style="height:24px"></div>
+  </div>
+  <div id="tripFab" style="display:none"></div>
+</div>
+
+<!-- ORE -->
+<div id="oscr" class="scr">
+  <div class="hdr home-hdr">
+    <h1 class="ptitle">Ore</h1>
+    <div class="hdr-actions"><button type="button" class="iconbtn" data-action="openSearch" aria-label="Cerca ovunque"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button><button type="button" class="iconbtn syncbtn" data-sync-indicator data-action="openSyncSettings" aria-label="Sincronizzazione"></button><button type="button" class="av avbtn" data-action="goTab" data-args="profilo" aria-label="Profilo" data-user-initials>ER</button></div>
+  </div>
+  <div class="sc" id="oreBody"></div>
+</div>
+
+<!-- TRASFERTE -->
+<div id="tscr" class="scr">
+  <div class="tr-hdr">
+    <h1 class="ptitle">Trasferte</h1>
+    <div class="hdr-actions"><button type="button" class="iconbtn" data-action="openSearch" aria-label="Cerca ovunque"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button><button type="button" class="tr-new" data-action="showNT"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Nuova</button><button type="button" class="av avbtn" data-action="goTab" data-args="profilo" aria-label="Profilo" data-user-initials>ER</button></div>
+  </div>
+  <div style="padding:0 16px 10px;flex-shrink:0"><div class="seg"><button type="button" class="on" id="tabP" data-action="swTTab" data-args="p">Prossime</button><button type="button" id="tabA" data-action="swTTab" data-args="a">Archivio</button></div></div>
+  <div class="sc" id="trList" style="padding-top:0"></div>
+</div>
+
+<!-- PRODOTTI -->
+<div id="rscr" class="scr">
+  <div class="hdr home-hdr">
+    <div><div class="eyebrow">Catalogo e guide</div><h1 class="ptitle">Prodotti</h1></div>
+    <div class="hdr-actions"><button type="button" class="iconbtn" data-action="openSearch" aria-label="Cerca ovunque"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button><button type="button" class="av avbtn" data-action="goTab" data-args="profilo" aria-label="Profilo" data-user-initials>ER</button></div>
+  </div>
+  <div class="sc" id="rBody"></div>
+</div>
+
+<!-- PARCO MACCHINE -->
+<div id="kscr" class="scr">
+  <div class="hdr home-hdr">
+    <div><div class="eyebrow">Parco macchine</div><h1 class="ptitle">Parco</h1></div>
+    <div class="hdr-actions"><button type="button" class="iconbtn" data-action="openSearch" aria-label="Cerca ovunque"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button><button type="button" class="av avbtn" data-action="goTab" data-args="profilo" aria-label="Profilo" data-user-initials>ER</button></div>
+  </div>
+  <div class="sc" id="kBody"></div>
+</div>
+
+<!-- PROFILO -->
+<div id="pscr" class="scr">
+  <div class="hdr home-hdr">
+    <div class="hdr-actions"><button type="button" class="iconbtn" data-action="goTab" data-args="home" aria-label="Torna alla Home"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg></button><h1 class="ptitle">Profilo</h1></div>
+    <button type="button" class="iconbtn" id="pt2" data-action="swPTab" data-args="2" aria-label="Impostazioni"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+  </div>
+  <div class="prof">
+    <div class="av2" data-user-initials>ER</div>
+    <div>
+      <div class="prof-n" data-user-name>Eduardo R.</div>
+      <div class="prof-s" data-user-email>e.roedel&#64;stem.it</div>
+      <button type="button" class="prof-ph" id="phBtn" data-action="editPhone"><span id="phTxt">Aggiungi numero</span></button>
+    </div>
+  </div>
+  <div class="seg ptabs2"><button type="button" class="on" id="pt0" data-action="swPTab" data-args="0">Lavoro</button><button type="button" id="pt1" data-action="swPTab" data-args="1">Credenziali e documenti</button><button type="button" id="pt4" data-action="swPTab" data-args="4">Clienti</button></div>
+  <div class="sc" id="pContent"></div>
+</div>
+
+<nav class="bnav">
+  <div class="ni on" id="n-h" data-action="goTab" data-args="home"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
+  <div class="ni" id="n-o" data-action="goTab" data-args="ore"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Ore</span></div>
+  <div class="ni" id="n-t" data-action="goTab" data-args="trasferte"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>Trasferte</span></div>
+  <div class="ni" id="n-r" data-action="goTab" data-args="prodotti"><svg viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span>Prodotti</span></div>
+  <div class="ni" id="n-k" data-action="goTab" data-args="parco"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg><span>Parco</span></div>
+</nav>
+</div>
+
+<!-- PAGINE DELLE SEZIONI NUOVE (prodotti, Spark, parco, segnalazioni) -->
+<div id="vPg" class="poppage">
+  <div class="bhdr"><div class="bbtn" data-action="viewBack" role="button" aria-label="Indietro"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="vt"><div class="bttl" id="vTitle"></div><div class="vsub" id="vSub" hidden></div></div><div id="vActs"></div></div>
+  <div class="psc" id="vBody"></div>
+</div>
+
+<!-- TRASFERTA DETAIL -->
+<div id="tdPg" class="poppage">
+  <div class="bhdr"><div class="bbtn" data-action="closeTD"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="bttl" id="tdTit">Trasferta</div><div style="display:flex;gap:8px"><div class="ibtn" data-action="editTr"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="ibtn" data-action="archiviaT"><svg viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/></svg></div><div class="ibtn d" data-action="eliminaT"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div></div></div>
+  <div class="psc" id="tdBody"></div>
+</div>
+
+<!-- NOTA SPESE DELLA TRASFERTA -->
+<div id="nsPg" class="poppage">
+  <div class="bhdr"><div class="bbtn" data-action="closeNotePage"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="bttl">Nota spese</div></div>
+  <div class="psc" id="nsBody"></div>
+  <div class="ns-bar" id="nsBar"></div>
+</div>
+
+<!-- NUOVA TRASFERTA -->
+<div id="ntPg" class="poppage">
+  <div class="bhdr"><div class="bbtn" data-action="closeNT"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="bttl">Nuova Trasferta</div></div>
+  <div class="psc">
+    <div class="fss" style="margin-top:16px">Date</div>
+    <div class="fcard"><div class="fg"><label class="fl">Data partenza</label><input type="date" class="fi" id="nt-d1"></div><div class="fg"><label class="fl">Data ritorno</label><input type="date" class="fi" id="nt-d2"></div><div class="fg" style="margin-bottom:0"><label class="fl" for="nt-sc">Scopo (per il foglio ore)</label><input type="text" class="fi" id="nt-sc" maxlength="120" placeholder="es. Riparazione e formazione utilizzo Spark"></div></div>
+    <div class="fss">Luogo</div>
+    <div class="fcard">
+      <div class="fg">
+        <label class="fl">Paese</label>
+        <select class="fs" id="nt-pa" data-change="toggleAltroInput">
+          <option value="">Seleziona paese</option>
+          <option value="belgio">Belgio</option>
+          <option value="francia">Francia</option>
+          <option value="germania">Germania</option>
+          <option value="italia">Italia</option>
+          <option value="portogallo">Portogallo</option>
+          <option value="repubblica ceca">Repubblica Ceca</option>
+          <option value="spagna">Spagna</option>
+          <option value="ungheria">Ungheria</option>
+          <option value="altro">Altro</option>
+        </select>
+      </div>
+      <div class="fg" id="altroInput" style="display:none;margin-bottom:12px">
+        <label class="fl">Specifica paese</label>
+        <input type="text" class="fi" id="nt-pa-altro" autocapitalize="words" placeholder="Inserisci il paese">
+      </div>
+      <div class="fg" style="margin-bottom:0">
+        <label class="fl">Città</label>
+        <input type="text" class="fi" id="nt-ci" autocapitalize="words" placeholder="es. Barcellona">
+      </div>
+    </div>
+    <div class="fss">Cliente</div>
+    <div class="fcard"><div id="ntClients"></div><datalist id="dl-clients"></datalist><button type="button" class="addlink" data-action="addClientBlock" style="margin-bottom:12px">+ Aggiungi cliente</button><div class="fg"><label class="fl" for="nt-app">Appuntamento cliente (opzionale)</label><input type="datetime-local" class="fi" id="nt-app"></div><div style="border-top:1px solid var(--line);margin:4px -14px 14px"></div><div class="fg" style="margin-bottom:0"><label class="fl">Indirizzo Hotel</label><input type="text" class="fi" id="nt-ho" placeholder="Nome e indirizzo hotel"></div></div>
+    <datalist id="dl-aero"></datalist>
+    <datalist id="dl-rent"></datalist>
+    <div class="fss">Volo Andata</div>
+    <div class="fcard" id="andataCard">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label class="fl">Aeroporto Part.</label><input type="text" class="fi" id="nt-a1" placeholder="MXP" list="dl-aero" autocomplete="off"></div>
+        <div class="fg"><label class="fl">Aeroporto Arr.</label><input type="text" class="fi" id="nt-a2" placeholder="BCN"></div>
+        <div class="fg"><label class="fl">Ora Partenza</label><input type="time" class="fi" id="nt-a3"></div>
+        <div class="fg"><label class="fl">Ora Arrivo</label><input type="time" class="fi" id="nt-a4"></div>
+      </div>
+      <div class="dep-hint" id="ntDepHint" aria-live="polite"></div>
+      <div class="fg" style="margin-bottom:8px"><label class="fl">N° Volo</label><input type="text" class="fi" id="nt-an" placeholder="FR1234"></div>
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0 8px">
+        <input type="checkbox" id="nt-ascale" data-change="togScale" data-args="a" style="width:18px;height:18px;cursor:pointer">
+        <label for="nt-ascale" style="font-size:11px;color:var(--t2);cursor:pointer">Volo con scalo (andata)</label>
+      </div>
+      <div id="nt-ascaleBox" style="display:none"></div>
+    </div>
+    <div class="fss">Volo Ritorno</div>
+    <div class="fcard" id="ritornoCard">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label class="fl">Aeroporto Part.</label><input type="text" class="fi" id="nt-r1" placeholder="BCN"></div>
+        <div class="fg"><label class="fl">Aeroporto Arr.</label><input type="text" class="fi" id="nt-r2" placeholder="MXP"></div>
+        <div class="fg"><label class="fl">Ora Partenza</label><input type="time" class="fi" id="nt-r3"></div>
+        <div class="fg"><label class="fl">Ora Arrivo</label><input type="time" class="fi" id="nt-r4"></div>
+      </div>
+      <div class="fg" style="margin-bottom:8px"><label class="fl">N° Volo</label><input type="text" class="fi" id="nt-rn" placeholder="FR5678"></div>
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0 8px">
+        <input type="checkbox" id="nt-rscale" data-change="togScale" data-args="r" style="width:18px;height:18px;cursor:pointer">
+        <label for="nt-rscale" style="font-size:11px;color:var(--t2);cursor:pointer">Volo con scalo (ritorno)</label>
+      </div>
+      <div id="nt-rscaleBox" style="display:none"></div>
+    </div>
+    <div class="fss">Auto Noleggio</div>
+    <div class="fcard"><div class="fg"><label class="fl">Auto a noleggio?</label><select class="fs" id="nt-au" data-change="togAF"><option value="no">No</option><option value="si">Sì</option></select></div><div id="aFields" style="display:none"><div class="fg"><label class="fl">Compagnia</label><input type="text" class="fi" id="nt-ac" placeholder="Hertz, Avis..." list="dl-rent" autocomplete="off"></div><div class="fg"><label class="fl">N° Prenotazione</label><input type="text" class="fi" id="nt-ap" placeholder="ABC123456"></div><div class="fg" style="margin-bottom:0"><label class="fl" for="nt-aur">Ritiro auto (opzionale)</label><input type="datetime-local" class="fi" id="nt-aur"></div></div></div>
+        <div class="fss">Altro</div>
+    <div class="fcard"><div class="fg" style="margin-bottom:0"><label class="fl">Viaggiato con (opzionale)</label><input type="text" class="fi" id="nt-vcon" placeholder="es. Mario Rossi"></div></div>
+    <div class="nt-save"><button class="sbtn" data-action="saveNT"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Salva Trasferta</button></div>
+  </div>
+</div>
+
+<!-- Carta d'imbarco: input unico, fuori dalle schermate -->
+<input type="file" id="bpFile" accept="image/*,application/pdf" hidden data-change="bpPicked" data-with="el">
+
+<!-- MODALS -->
+<!-- RIEPILOGO USCITA -->
+<div class="overlay" id="urm" data-backdrop="urm">
+  <div class="modal sheet"><div class="mh"></div>
+    <h2 id="urTitle">Registra uscita</h2>
+    <div id="urTimeWrap" style="margin-bottom:14px"><label class="fl" for="urTime">Uscita alle</label><input id="urTime" type="time" class="tin"></div>
+    <div id="urBody"></div>
+    <div class="btnrow" id="urBtns"></div>
+  </div>
+</div>
+
+<!-- LAVORO: CARTELLA -->
+<div class="overlay" id="wfm" data-backdrop="wfm">
+  <div class="modal sheet"><div class="mh"></div>
+    <h2 id="wfTitle">Nuova cartella</h2>
+    <label class="fl" for="wfName">Nome</label><input type="text" class="fi" id="wfName" maxlength="60" placeholder="es. Validazioni">
+    <div class="btnrow"><button type="button" class="b-danger" id="wfDel" data-action="delFolder">Elimina</button><button type="button" class="b-main" data-action="saveFolder">Salva</button></div>
+  </div>
+</div>
+
+<!-- LAVORO: AGGIORNAMENTO -->
+<div class="overlay" id="wem" data-backdrop="wem">
+  <div class="modal sheet"><div class="mh"></div>
+    <h2>Aggiornamento</h2>
+    <label class="fl" for="weDate">Data</label><input type="date" class="fi" id="weDate" style="margin-bottom:12px">
+    <label class="fl" for="weText">Cosa hai fatto</label><textarea class="fi" id="weText" rows="5" maxlength="4000" placeholder="es. Completati i test PAR 1–12, aperto ticket su timeout CAN" style="resize:vertical"></textarea>
+    <label class="fl" for="weTagIn" style="margin-top:12px">Tag</label>
+    <div class="wtags" id="weTags" style="margin-bottom:6px"></div>
+    <div style="display:flex;gap:8px"><input type="text" class="fi" id="weTagIn" maxlength="30" placeholder="es. R-3L XP" style="flex:1"><button type="button" class="pill" style="height:44px" data-action="weAddFromInput">Aggiungi</button></div>
+    <div class="wtags" id="weSugg" style="margin-top:8px"></div>
+    <div class="btnrow"><button type="button" class="b-danger" id="weDel" data-action="delEntry">Elimina</button><button type="button" class="b-main" data-action="saveEntry">Salva</button></div>
+  </div>
+</div>
+
+<!-- DOCUMENTO -->
+<div class="overlay" id="docm" data-backdrop="docm">
+  <div class="modal sheet"><div class="mh"></div>
+    <h2>Documento</h2>
+    <label class="fl" for="dcT">Tipo</label><select class="fs" id="dcT" style="width:100%;margin-bottom:12px"><option>Passaporto</option><option>Carta d’identità</option><option>Patente</option><option>Tessera sanitaria</option><option>Visto</option><option>Permesso di soggiorno</option><option>Altro</option></select>
+    <label class="fl" for="dcN">Nome (facoltativo)</label><input type="text" class="fi" id="dcN" maxlength="80" placeholder="es. Passaporto italiano" style="margin-bottom:12px">
+    <label class="fl" for="dcNum">Numero</label><div style="display:flex;gap:8px;margin-bottom:12px"><input type="text" class="fi" id="dcNum" maxlength="60" autocomplete="off" style="flex:1"><button type="button" class="pill" id="dcCopy" style="height:44px" data-action="copyDocNum">Copia</button></div>
+    <div class="sgrid"><div><label class="fl" for="dcS">Scadenza</label><input type="date" class="fi" id="dcS"></div><div><label class="fl" for="dcE">Rilasciato da</label><input type="text" class="fi" id="dcE" maxlength="80" placeholder="es. Questura PR"></div></div>
+    <label class="fl" for="dcNote" style="margin-top:12px">Note</label><textarea class="fi" id="dcNote" rows="2" maxlength="1000" style="resize:vertical"></textarea>
+    <div class="btnrow"><button type="button" class="b-danger" id="dcDel" data-action="delDoc">Elimina</button><button type="button" class="b-main" data-action="saveDoc">Salva</button></div>
+  </div>
+</div>
+
+<!-- CLIENTE -->
+<div class="overlay" id="clm" data-backdrop="clm">
+  <div class="modal sheet" style="max-height:88vh;overflow-y:auto"><div class="mh"></div>
+    <h2>Cliente</h2>
+    <label class="fl" for="clName">Azienda</label><input type="text" class="fi" id="clName" maxlength="100" autocapitalize="words" placeholder="es. Ospedale di Lille" style="margin-bottom:12px">
+    <label class="fl" for="clAddr">Indirizzo</label><input type="text" class="fi" id="clAddr" maxlength="200" style="margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span class="fl" style="margin:0">Contatti</span><button type="button" class="pill" data-action="addClientContact">+ Contatto</button></div>
+    <div id="clContacts" style="display:flex;flex-direction:column;gap:10px"></div>
+    <label class="fl" for="clNote" style="margin-top:12px">Note</label><textarea class="fi" id="clNote" rows="2" maxlength="1000" style="resize:vertical"></textarea>
+    <span class="fl" style="display:block;margin-top:12px">Trasferte</span><div class="dv-tags" id="clTrips" style="margin-top:6px"></div>
+    <div class="btnrow"><button type="button" class="b-danger" id="clDel" data-action="delClient">Elimina</button><button type="button" class="b-main" data-action="saveClient">Salva</button></div>
+  </div>
+</div>
+
+<!-- VISTA GIORNATA -->
+<div class="overlay" id="dvm" data-backdrop="dvm">
+  <div class="modal sheet"><div class="mh"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px">
+      <h2 id="dvTitle" style="margin:0">Giorno</h2>
+      <button type="button" class="iconbtn" data-action="dvEdit" aria-label="Modifica"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button>
+    </div>
+    <div id="dvBody"></div>
+    <div class="btnrow"><button type="button" class="b-ghost" data-action="closeM" data-args="dvm">Chiudi</button></div>
+  </div>
+</div>
+
+<!-- MODIFICA GIORNATA -->
+<div class="overlay" id="dem" data-backdrop="dem">
+  <div class="modal sheet"><div class="mh"></div>
+    <h2 id="deTitle">Giornata</h2>
+    <div id="deKind" style="font-size:11px;color:var(--muted);margin:-8px 0 12px"></div>
+    <div id="deInfo" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
+    <button type="button" class="addlink" id="deStd" data-action="fillStandard" style="margin-bottom:14px">Standard 07:30–16:30</button>
+    <div class="sgrid">
+      <div><label class="fl" for="deE">Entrata</label><input id="deE" type="time" class="tin"></div>
+      <div><label class="fl" for="deU">Uscita</label><input id="deU" type="time" class="tin"></div>
+    </div>
+    <div id="dePauseWrap" style="margin-top:14px"><span class="fl">Pausa</span>
+      <div class="seg" id="dePause"><button type="button" data-action="dePause" data-args="30">30 min</button><button type="button" data-action="dePause" data-args="60">1 ora</button></div>
+    </div>
+    <div style="margin-top:14px"><span class="fl">Uscite e rientri (permesso)</span>
+      <div id="deOut" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+      <button type="button" class="addlink" data-action="addOut">+ Esco e rientro</button>
+    </div>
+    <div class="res" id="deRes" style="margin-top:14px"></div>
+    <div style="margin-top:16px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span class="fl" style="margin:0">Note</span><button type="button" class="bc2" data-action="openNoteEditor">+ Nota</button></div><div id="notesList"></div></div>
+    <div class="btnrow"><button type="button" class="b-danger" data-action="clearDay">Cancella</button><button type="button" class="b-main" data-action="saveDay">Salva</button></div>
+  </div>
+</div>
+
+<!-- PIANIFICA PERMESSO -->
+<div class="overlay" id="ppm" data-backdrop="ppm">
+  <div class="modal sheet"><div class="mh"></div>
+    <h2>Permesso o ferie</h2>
+    <label class="fl" for="ppD">Giorno</label><input id="ppD" type="date" class="tin sm" style="font-family:var(--font-sans);margin-bottom:14px">
+    <div class="seg" id="ppKind"><button type="button" data-action="ppKind" data-args="entro">Entro dopo</button><button type="button" data-action="ppKind" data-args="meta">A metà</button><button type="button" data-action="ppKind" data-args="esco">Esco prima</button><button type="button" data-action="ppKind" data-args="tutto">Tutto</button></div>
+    <div class="sgrid" style="margin-top:14px">
+      <div id="ppAWrap"><label class="fl" for="ppA" id="ppALbl">Entro alle</label><input id="ppA" type="time" class="tin"></div>
+      <div id="ppBWrap"><label class="fl" for="ppB" id="ppBLbl">Rientro alle</label><input id="ppB" type="time" class="tin"></div>
+    </div>
+    <label class="fl" for="ppM" style="margin-top:14px">Motivo (facoltativo)</label><input id="ppM" type="text" class="fi" maxlength="80" placeholder="Visita medica">
+    <div class="res" id="ppRes" style="margin-top:14px"></div>
+    <div class="btnrow"><button type="button" class="b-ghost" data-action="closeM" data-args="ppm">Annulla</button><button type="button" class="b-main" data-action="savePermit">Salva</button></div>
+  </div>
+</div>
+
+<!-- SCELTA ORARIO -->
+<div class="overlay" id="tpm" data-backdrop="tpm">
+  <div class="modal sheet"><div class="mh"></div>
+    <h2 id="tpTitle">Orario</h2>
+    <input id="tpIn" type="time" class="tin" style="height:72px;font-size:30px">
+    <div class="btnrow"><button type="button" class="b-ghost" data-action="closeM" data-args="tpm">Annulla</button><button type="button" class="b-main" id="tpOk" data-action="tpConfirm">Conferma</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="notem" data-backdrop="notem">
+  <div class="modal" style="position:relative"><div class="mh"></div>
+    <button class="mcl" data-action="closeM" data-args="notem"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div class="mt" id="noteMTitle">Nuova nota</div>
+    <div class="fg"><textarea class="nta" id="noteTA" placeholder="Scrivi la tua nota..." style="min-height:120px;resize:vertical"></textarea></div>
+    <div class="mbr">
+      <button class="bc" data-action="closeM" data-args="notem">Annulla</button>
+      <button class="bk" id="noteDelBtn" style="background:var(--re);display:none" data-action="delNote">Elimina</button>
+      <button class="bk" data-action="saveNote">Salva</button>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="spesam" data-backdrop="spesam">
+  <div class="modal sheet sp-sheet"><div class="mh"></div>
+    <div class="sp-top"><h2 id="spesaMTitle">Nuova spesa</h2><span class="chip" id="spAdded" hidden></span></div>
+    <div class="sp-sec"><span class="fl">Giorno</span><div class="sp-chips" id="spDays"></div><input type="date" class="fi" id="sp-dat" aria-label="Data" hidden></div>
+    <div class="sp-sec"><span class="fl">Categoria</span><div class="sp-cats" id="spCats"></div></div>
+    <div class="sp-sec"><label class="fl" for="sp-det">Dettagli</label><input type="text" class="fi" id="sp-det" maxlength="80" autocomplete="off"><div class="sp-chips" id="spSugg"></div></div>
+    <div class="sp-amt">
+      <div><label class="fl" for="sp-imp">Importo</label><div class="sp-imp"><span id="sp-cur">€</span><input type="text" id="sp-imp" inputmode="decimal" placeholder="0,00" autocomplete="off"></div></div>
+      <div><label class="fl" for="sp-val">Valuta</label><select class="fs" id="sp-val" data-change="spValChanged"><option value="EURO">EUR</option><option value="Sterline">GBP</option><option value="Dollari">USD</option><option value="Altro">Altro</option></select></div>
+    </div>
+    <div class="sp-sec" id="sp-cambioRow" hidden><label class="fl" for="sp-cambio">Cambio (€ per 1 unità)</label><input type="text" class="fi" id="sp-cambio" inputmode="decimal" placeholder="es. 1,17"></div>
+    <button type="button" class="sp-x2" id="sp-x2row" data-action="spToggleX2" hidden><span class="sp-check"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span><span id="sp-x2lbl">Pagato anche per il collega (×2)</span></button>
+    <div class="sp-sec"><span class="fl">Documento</span><div class="seg" id="spDoc"></div></div>
+    <div class="sp-sec"><span class="fl">Pagato con</span><div class="seg" id="spPag"></div></div>
+    <div class="sp-sec">
+      <div id="sp-photo" class="sp-photo"></div>
+      <label class="addlink sp-photo-btn" for="sp-file">📷 Foto scontrino</label>
+      <input type="file" id="sp-file" accept="image/*" capture="environment" hidden data-change="spPhotoPicked" data-with="el">
+    </div>
+    <div class="btnrow sp-actions" id="spActions"></div>
+  </div>
+</div>
+<!-- INTERVENTO (prodotto, motivo, esito) -->
+<div class="overlay" id="ivm" data-backdrop="ivm">
+  <div class="modal sheet sp-sheet iv-sheet"><div class="mh"></div>
+    <div class="sp-top"><h2 id="ivTitle">Nuovo intervento</h2></div>
+    <div class="sp-sec" id="ivHistSec" hidden><span class="fl">Già viste da questo cliente</span><div class="sp-chips" id="ivHist"></div></div>
+    <div class="sp-sec"><span class="fl">Prodotto</span><div class="iv-cats" id="ivCats"></div><div class="sp-chips" id="ivProds"></div></div>
+    <div class="sp-sec"><div class="iv-two"><div><label class="fl" for="iv-ser">Numero di serie</label><input type="text" class="fi" id="iv-ser" maxlength="40" autocomplete="off" list="dl-sn" placeholder="es. 58424"></div><div><label class="fl" for="iv-yr">Anno</label><input type="text" class="fi" id="iv-yr" maxlength="4" inputmode="numeric" autocomplete="off" placeholder="2024"></div></div><div class="iv-hint">Con il numero di serie l'intervento entra nella storia della macchina, nel Parco.</div></div>
+    <div class="sp-sec"><label class="fl" for="iv-err">Codice errore (facoltativo)</label><input type="text" class="fi" id="iv-err" maxlength="12" autocomplete="off" list="dl-err" placeholder="es. E011" style="width:100%;font-family:var(--mono)"></div>
+    <div class="sp-sec"><span class="fl">Tipo</span><div class="sp-chips" id="ivTipo"></div></div>
+    <div class="sp-sec"><span class="fl">Esito</span><div class="sp-chips" id="ivEsito"></div></div>
+    <div class="sp-sec"><label class="fl" for="iv-note">Note</label><textarea class="fi" id="iv-note" rows="3" maxlength="2000" placeholder="Cosa hai trovato, cosa hai fatto"></textarea></div>
+    <div class="btnrow sp-actions" id="ivActions"></div>
+  </div>
+</div>
+<datalist id="dl-sn"></datalist>
+<datalist id="dl-err"></datalist>
+
+<!-- IMPOSTAZIONI › PRODOTTI -->
+<div class="overlay" id="prodm" data-backdrop="prodm">
+  <div class="modal sheet sp-sheet"><div class="mh"></div>
+    <h2>Prodotti</h2>
+    <div class="iv-hint">Tocca un prodotto per nasconderlo dagli interventi (resta nelle trasferte vecchie).</div>
+    <div id="prodBody"></div>
+    <div class="btnrow"><button type="button" class="b-main" data-action="closeM" data-args="prodm">Fatto</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="evm" data-backdrop="evm">
+  <div class="modal sheet"><div class="mh"></div>
+    <h2>Nuovo evento</h2>
+    <input type="hidden" id="evTipo" value="evento">
+    <div id="evTG"><label class="fl" for="evTit">Titolo</label><input type="text" class="fi" id="evTit" placeholder="es. Riunione clienti" maxlength="80"></div>
+    <div class="sgrid" style="margin-top:14px">
+      <div><label class="fl" for="evDat">Giorno</label><input type="date" class="fi" id="evDat"></div>
+      <div id="evOG"><label class="fl" for="evOra">Orario (facoltativo)</label><input type="time" class="fi" id="evOra"></div>
+    </div>
+    <div id="evPermG" style="display:none"><input type="hidden" id="evPOra1" value="07:30"><input type="hidden" id="evPOra2" value="16:30"><div id="evPermCalc"></div></div>
+    <button type="button" class="addlink" style="margin-top:14px" data-action="evToPermit">Permesso o ferie →</button>
+    <div class="btnrow"><button type="button" class="b-ghost" data-action="closeM" data-args="evm">Annulla</button><button type="button" class="b-main" data-action="saveEv">Salva</button></div>
+  </div>
+</div>
+
+
+
+<div class="overlay" id="edm" data-backdrop="edm">
+  <div class="modal" style="position:relative"><div class="mh"></div>
+  <div style="display:flex;align-items:flex-start;margin-bottom:16px"><div style="flex:1"><div class="mt" style="margin-bottom:4px" id="edTitle">Evento</div><div style="color:var(--t2);font-size:11px" id="edSub"></div></div><div style="display:flex;gap:8px;margin-top:2px"><div class="ibtn d" data-action="delEv"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div></div></div>
+  <button class="bc" style="width:100%" data-action="closeM" data-args="edm">Chiudi</button></div>
+</div>
+
+<div class="overlay" id="pasm" style="overflow-y:auto">
+  <div class="modal"><div class="mh"></div><button class="mcl" data-action="closePasM"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  <div class="passlock">
+    <div class="lic"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+    <div id="pasTitle" style="font-size:16px;font-weight:700;font-family:var(--font-serif);margin-bottom:6px;text-align:center">Sezione protetta</div>
+    <div id="pasDesc" style="font-size:11px;color:var(--t2);margin-bottom:20px;text-align:center;max-width:320px;margin-left:auto;margin-right:auto">Inserisci la password principale</div>
+    <div class="fg" style="max-width:280px;width:100%;margin:0 auto 16px">
+      <input type="password" class="fi" id="pinInput" placeholder="Password" style="font-size:16px;text-align:center;padding:14px" autocomplete="current-password" autocapitalize="off" spellcheck="false">
+      <input type="password" class="fi" id="pinInput2" placeholder="Ripeti password" style="font-size:16px;text-align:center;padding:14px;margin-top:10px;display:none" autocomplete="new-password" autocapitalize="off" spellcheck="false">
+    </div>
+    <button class="sbtn" id="pasBtn" data-action="chkPIN" style="max-width:280px;margin:0 auto">Sblocca</button>
+    <div id="pErr" style="color:var(--re);font-size:11px;font-weight:600;height:20px;text-align:center;margin-top:12px"></div>
+  </div></div>
+</div>
+
+<div class="overlay" id="phm" data-backdrop="phm">
+  <div class="modal" style="position:relative"><div class="mh"></div><button class="mcl" data-action="closeM" data-args="phm"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><div class="mt">Numero aziendale</div>
+  <div class="fg"><label class="fl">Numero di telefono</label><input type="tel" class="fi" id="phIn" placeholder="+39 0521 000000"></div>
+  <div class="mbr"><button class="bc" data-action="closeM" data-args="phm">Annulla</button><button class="bk" data-action="savePh">Salva</button></div></div>
+</div>
+
+<div class="overlay" id="crm" data-backdrop="crm">
+  <div class="modal" style="position:relative"><div class="mh"></div><button class="mcl" data-action="closeM" data-args="crm"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><div class="mt">Nuova credenziale</div>
+  <div class="fg"><label class="fl">Nome</label><input type="text" class="fi" id="cr-n" placeholder="es. VPN Aziendale"></div>
+  <div class="fg"><label class="fl">Categoria</label><select class="fs" id="cr-c"><option value="Aziendale">Aziendale</option><option value="Telefonia">Telefonia</option><option value="Voli">Voli</option><option value="Altro">Altro</option></select></div>
+  <div class="fg"><label class="fl">Username / Email</label><input type="text" class="fi" id="cr-u" placeholder="username o email"></div>
+  <div class="fg"><label class="fl">Password</label><input type="password" class="fi" id="cr-p" placeholder="password" autocomplete="off"></div>
+  <div class="fg"><label class="fl" for="cr-url">Link (facoltativo)</label><input type="url" class="fi" id="cr-url" placeholder="https://portale.esempio.it" autocomplete="off"></div>
+  <div class="fg"><label class="fl" for="cr-note">Note (facoltative)</label><textarea class="fi" id="cr-note" rows="3" placeholder="PIN, domande di sicurezza, istruzioni…" style="resize:vertical"></textarea></div>
+  <div class="mbr"><button class="bc" data-action="closeM" data-args="crm">Annulla</button><button class="bk" data-action="saveCr">Aggiungi</button></div></div>
+</div>
+
+<div class="overlay" id="mdm" data-backdrop="mdm">
+  <div class="modal sheet" style="max-height:80vh;display:flex;flex-direction:column"><div class="mh"></div>
+    <h2 id="mdTitle">Dettaglio</h2>
+    <div style="flex:1;overflow-y:auto" id="mdContent"></div>
+    <div class="btnrow"><button type="button" class="b-ghost" data-action="closeM" data-args="mdm">Chiudi</button></div>
+  </div>
+</div>
+
+<!-- RICERCA UNICA -->
+<div class="overlay x-srch" id="srch" role="dialog" aria-label="Cerca">
+  <div class="x-srch-top">
+    <label class="x-sfield"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="srchQ" type="search" placeholder="Errore, S/N, cliente, prodotto…" aria-label="Cerca" autocomplete="off" enterkeyhint="search"></label>
+    <button type="button" class="iconbtn" data-action="closeSearch" aria-label="Chiudi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="x-srch-res" id="srchRes"></div>
+</div>
+
+<div class="toast" id="tst"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span id="tstM">Salvato!</span></div>
+
+<div class="overlay" id="phv" data-backdrop="phv" style="align-items:center;padding:16px;z-index:300">
+  <img id="phvImg" alt="Foto scontrino" style="max-width:100%;max-height:85vh;border-radius:12px;background:#fff">
+</div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
