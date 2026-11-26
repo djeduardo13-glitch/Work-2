@@ -1,0 +1,53 @@
+/* ── Interventi: card nella trasferta e foglio ───────── */
+
+/* card nella pagina trasferta */
+.iv-card { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.iv-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.iv-tot { font-weight: 600; color: var(--muted); font-size: 13px; }
+.iv-add { height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: var(--blue); color: #fff; font: 700 13px var(--font-sans); cursor: pointer; flex-shrink: 0; }
+.iv-empty { font-size: 12px; color: var(--muted); }
+.iv-row {
+  display: flex; flex-direction: column; gap: 8px; width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--line);
+  background: #fff; color: var(--ink); text-align: left; cursor: pointer; font-family: var(--font-sans);
+}
+.iv-row.dim { border-style: dashed; border-color: #cfc8b8; }
+.iv-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.iv-main { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.iv-name { font-size: 15px; font-weight: 700; }
+.iv-sub { font-size: 12px; color: var(--muted); }
+.iv-amt { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
+.iv-amt b { font: 700 14px var(--mono); }
+.iv-amt span { font-size: 11px; color: var(--muted); }
+.iv-row.dim .iv-amt b { color: var(--muted); }
+.iv-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+.iv-pill { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 12px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.iv-pill.main { background: var(--blue); color: #fff; }
+.iv-pill.mute { background: var(--cream); color: #4a463e; }
+.iv-pill.blue { background: var(--tint); color: var(--blue); }
+.iv-pill.warn { background: var(--warnbg); color: var(--warn); }
+.iv-pill.red { background: var(--rl); color: var(--re); }
+.iv-pill.ok { background: var(--okbg); color: var(--ok); }
+.iv-split { display: flex; flex-direction: column; gap: 6px; padding-top: 2px; }
+.iv-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: var(--cream); }
+.iv-bar i { display: block; height: 100%; }
+.iv-legend { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-size: 12px; }
+.iv-legend b { font-weight: 700; }
+.iv-note { font-size: 12px; color: var(--muted); }
+.iv-note.warn { padding: 9px 12px; border-radius: 12px; background: var(--warnbg); color: var(--warn); font-weight: 600; }
+
+/* foglio "Intervento" */
+.iv-cats { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 8px; padding-bottom: 2px; scrollbar-width: none; }
+.iv-cats::-webkit-scrollbar { display: none; }
+.iv-cat {
+  height: 32px; padding: 0 11px; border-radius: 16px; border: 1px solid var(--line); background: var(--cream); color: var(--muted);
+  font: 700 12px var(--font-sans); white-space: nowrap; flex-shrink: 0; cursor: pointer;
+}
+.iv-cat.sel { background: var(--ink); border-color: var(--ink); color: #fff; }
+.iv-ser { font: 500 11px var(--mono); opacity: .75; }
+.iv-two { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 8px; }
+.iv-two .fi { width: 100%; font-family: var(--mono); }
+.iv-hint { font-size: 12px; color: var(--muted); margin: -2px 0 8px; }
+.iv-sheet textarea.fi { width: 100%; resize: none; font-family: var(--font-sans); }
+.sp-chip.off { background: var(--cream); color: #9a9486; text-decoration: line-through; border-style: dashed; }
+
+.iv-sub .nw { white-space: nowrap; }
