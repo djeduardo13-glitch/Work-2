@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
-
-// Il sito è pubblicato su https://<utente>.github.io/Work-Manager-2/
+ 
+// Il sito è pubblicato su https://<utente>.github.io/Work-2/
 // Se rinomini la repo, cambia anche `base`.
 export default defineConfig({
   base: '/Work-2/',
